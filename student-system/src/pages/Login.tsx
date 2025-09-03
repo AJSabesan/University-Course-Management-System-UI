@@ -69,32 +69,32 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-animated-gradient flex items-center justify-center p-4 overflow-hidden">
+      <div className="w-full max-w-md relative z-10">
         {/* Back to Home */}
         <div className="mb-6">
-          <Button variant="ghost" asChild className="text-white hover:bg-white/10">
+          <Button variant="ghost" asChild className="text-white hover:bg-white/10 text-lg">
             <Link to="/">
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className="h-5 w-5 mr-2" />
               Back to Home
             </Link>
           </Button>
         </div>
 
-        <Card className="shadow-hover">
-          <CardHeader className="text-center">
-            <div className="flex justify-center mb-4">
-              <GraduationCap className="h-12 w-12 text-primary" />
+        <Card className="shadow-xl border-none bg-white/80 backdrop-blur-sm animate-fade-in">
+          <CardHeader className="text-center space-y-2">
+            <div className="flex justify-center mb-2">
+              <GraduationCap className="h-16 w-16 text-primary" />
             </div>
-            <CardTitle className="text-2xl font-bold">Sign In</CardTitle>
-            <CardDescription>
-              Access your university account to manage courses and view results
+            <CardTitle className="text-4xl font-extrabold text-gray-900">Welcome Back!</CardTitle>
+            <CardDescription className="text-gray-600 text-base">
+              Sign in to manage your academic journey.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-base">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -102,11 +102,12 @@ const Login = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  className="text-base"
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-base">Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -114,22 +115,23 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  className="text-base"
                 />
               </div>
 
               <Button 
                 type="submit" 
-                className="w-full" 
+                className="w-full text-lg py-3" 
                 disabled={isLoading}
               >
                 {isLoading ? "Signing In..." : "Sign In"}
               </Button>
             </form>
 
-            <div className="mt-6 text-center text-sm text-muted-foreground">
-              <p>Demo Credentials:</p>
-              <p>Admin: admin@university.edu / admin123</p>
-              <p>Student: potter@stu.university.edu / potter123</p>
+            <div className="mt-8 text-center text-base text-gray-500">
+              <p className="mb-1">Demo Credentials:</p>
+              <p className="font-mono text-sm">Admin: admin@university.edu / admin123</p>
+              <p className="font-mono text-sm">Student: potter@stu.university.edu / potter123</p>
             </div>
           </CardContent>
         </Card>

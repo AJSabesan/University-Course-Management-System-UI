@@ -19,9 +19,9 @@ All colors MUST be HSL.
     --popover-foreground: 222.2 84% 4.9%;
 
     /* Academic Blue Primary */
-    --primary: 217 91% 35%;
+    --primary: 217 91% 30%;
     --primary-foreground: 0 0% 98%;
-    --primary-hover: 217 91% 30%;
+    --primary-hover: 217 91% 20%;
 
     /* Professional Secondary */
     --secondary: 210 40% 96.1%;
@@ -51,7 +51,7 @@ All colors MUST be HSL.
     
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(217 91% 35%), hsl(171 85% 35%));
-    --gradient-hero: linear-gradient(135deg, hsl(217 91% 35%) 0%, hsl(217 91% 45%) 100%);
+    --gradient-hero: linear-gradient(to right top, #d16ba5, #c777b9, #ba83ca, #aa8fd8, #9a9ae1, #8aa7ec, #79b3f4, #69bff8, #52cffe, #41dfff, #46eefa, #5ffbf1);
     --gradient-card: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(217 91% 98%) 100%);
     
     /* Shadows */
@@ -79,6 +79,41 @@ All colors MUST be HSL.
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Custom for enhanced cards */
+    --card-gradient-start: 0 0% 100%;
+    --card-gradient-end-primary: 217 91% 98%;
+    --card-gradient-end-accent: 171 85% 98%;
+    --card-gradient-end-warning: 38 92% 98%;
+    --pattern-light-opacity: 0.05;
+    --sidebar-width-collapsed: 80px; /* Collapsed width */
+    --sidebar-width-expanded: 256px; /* Expanded width */
+  }
+
+  .admin-dashboard-container {
+    display: flex;
+  }
+
+  .admin-dashboard-container .admin-dashboard-content {
+    flex-grow: 1;
+    padding-left: 1.5rem; /* px-6 */
+    padding-right: 1.5rem; /* px-6 */
+    padding-top: 2rem; /* py-8 or equivalent */
+    padding-bottom: 2rem; /* py-8 or equivalent */
+    transition: margin-left 0.3s ease-in-out;
+    margin-left: var(--sidebar-width-collapsed);
+  }
+
+  .admin-dashboard-container.expanded .admin-dashboard-content {
+    margin-left: var(--sidebar-width-expanded);
+  }
+
+  .admin-dashboard-container .sidebar {
+    width: var(--sidebar-width-collapsed);
+  }
+
+  .admin-dashboard-container.expanded .sidebar {
+    width: var(--sidebar-width-expanded);
   }
 
   .dark {
@@ -117,6 +152,13 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Custom for enhanced cards - Dark Mode */
+    --card-gradient-start: 222.2 84% 4.9%;
+    --card-gradient-end-primary: 217 91% 10%;
+    --card-gradient-end-accent: 171 85% 10%;
+    --card-gradient-end-warning: 38 92% 10%;
+    --pattern-dark-opacity: 0.15;
   }
 }
 
@@ -128,4 +170,30 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@keyframes gradient-animation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.bg-animated-gradient {
+  background: var(--gradient-hero);
+  background-size: 400% 400%;
+  animation: gradient-animation 15s ease infinite;
+}
+
+/* Background pattern for cards */
+.bg-pattern-light {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM6 24v-4H4v4H0v2h4v4h2v-4h4v-2H6zm0 20v-4H4v4H0v2h4v4h2v-4h4v-2H6zm0-20v-4H4v4H0v2h4v4h2v-4h4v-2H6zM26 4v-4h-2v4h-4v2h4v4h2V6h4V4h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM46 4v-4h-2v4h-4v2h4v4h2V6h4V4h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.dark .bg-pattern-light {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232A2633' fill-opacity='0.2'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM6 24v-4H4v4H0v2h4v4h2v-4h4v-2H6zm0 20v-4H4v4H0v2h4v4h2v-4h4v-2H6zm0-20v-4H4v4H0v2h4v4h2v-4h4v-2H6zM26 4v-4h-2v4h-4v2h4v4h2V6h4V4h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM46 4v-4h-2v4h-4v2h4v4h2V6h4V4h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }

@@ -11,6 +11,8 @@ import api from "@/lib/axios";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
+import { cn } from "@/lib/utils";
+
 type Student = { id: number; name: string; email: string; studentNumber: string };
 type Course = { id: number; code: string; title: string; credits: number; instructor: string };
 type Registration = { id: number; student: Student; course: Course; registrationDate: string };
@@ -26,6 +28,8 @@ const StudentDashboard = () => {
   const [selectedStudentNumber, setSelectedStudentNumber] = useState("");
   const { toast } = useToast();
   const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState("courses");
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
 
   // Fetch data
   const fetchStudents = async () => {
@@ -112,197 +116,216 @@ const StudentDashboard = () => {
     return 'bg-university-gray text-white';
   };
 
+  const renderProfile = () => (
+    <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-3xl font-bold text-gray-900">Student Profile</CardTitle>
+        <CardDescription className="text-lg text-gray-600">View and manage your personal information.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4 text-base text-gray-700">
+        <div><span className="font-semibold">Name:</span> {currentStudent?.name}</div>
+        <div><span className="font-semibold">Email:</span> {currentStudent?.email}</div>
+        <div><span className="font-semibold">Student Number:</span> {currentStudent?.studentNumber}</div>
+      </CardContent>
+    </Card>
+  );
+
   return (
-    <div className="min-h-screen bg-background">
-      <StudentNavigation />
+    <div className={cn("min-h-screen bg-gray-50", isSidebarExpanded ? "admin-dashboard-container expanded" : "admin-dashboard-container")}>
+      <StudentNavigation activeTab={activeTab} setActiveTab={setActiveTab} setIsExpanded={setIsSidebarExpanded} />
       
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Student Dashboard</h1>
-          <p className="text-muted-foreground">Welcome back! Manage your courses and track your progress.</p>
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="md:col-span-1">
-              <Label htmlFor="student-number">Your Student Number</Label>
-              <Input id="student-number" value={selectedStudentNumber} onChange={(e) => setSelectedStudentNumber(e.target.value)} placeholder="e.g., STU001" />
-            </div>
-            <div className="md:col-span-2 text-sm text-muted-foreground self-end">
-              {currentStudent ? `Logged in as ${currentStudent.name} (${currentStudent.email})` : "Enter your student number to see your data."}
-            </div>
-          </div>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="shadow-card">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Enrolled Courses</CardTitle>
-              <BookOpen className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-primary">{myCourses.length}</div>
-              <p className="text-xs text-muted-foreground">Active this semester</p>
-            </CardContent>
-          </Card>
-          
-          <Card className="shadow-card">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Credits</CardTitle>
-              <GraduationCap className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-primary">
-                {myCourses.reduce((sum, course: any) => sum + (course.credits || 0), 0)}
+      <div className="flex-1 transition-all duration-300" style={{ marginLeft: isSidebarExpanded ? "var(--sidebar-width-expanded)" : "var(--sidebar-width-collapsed)" }}>
+        <div className="container mx-auto px-6 py-10">
+          {/* Header (now dynamic based on activeTab) */}
+          {activeTab === "courses" && (
+            <div className="space-y-8">
+              <div className="text-center">
+                <h1 className="text-5xl font-extrabold text-gray-900 mb-3">Student Dashboard</h1>
+                <p className="text-xl text-gray-600">Welcome back! Manage your courses, track progress, and view your academic records.</p>
               </div>
-              <p className="text-xs text-muted-foreground">Credit hours enrolled</p>
-            </CardContent>
-          </Card>
-          
-          <Card className="shadow-card">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Completed Courses</CardTitle>
-              <Trophy className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-primary">{results.filter(r => r.studentNumber === selectedStudentNumber).length}</div>
-              <p className="text-xs text-muted-foreground">Courses completed</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Main Content */}
-        <Tabs defaultValue="courses" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="courses">Available Courses</TabsTrigger>
-            <TabsTrigger value="my-courses">My Courses</TabsTrigger>
-            <TabsTrigger value="results">Results</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="courses">
-            <Card className="shadow-card">
-              <CardHeader>
-                <CardTitle>Available Courses</CardTitle>
-                <CardDescription>Browse and register for available courses</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Course Code</TableHead>
-                      <TableHead>Course Name</TableHead>
-                      <TableHead>Credits</TableHead>
-                      <TableHead>Instructor</TableHead>
-                      <TableHead>Action</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {availableCourses.map((course) => (
-                      <TableRow key={course.id}>
-                        <TableCell className="font-medium">{course.code}</TableCell>
-                        <TableCell>{course.title}</TableCell>
-                        <TableCell>{course.credits}</TableCell>
-                        <TableCell>{course.instructor}</TableCell>
-                        <TableCell>
-                          <Button 
-                            size="sm" 
-                            onClick={() => handleRegister(course.id)}
-                            className="bg-university-success hover:bg-university-success/90"
-                          >
-                            <Plus className="h-4 w-4 mr-1" />
-                            Register
-                          </Button>
-                        </TableCell>
+              {/* Stats Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+                <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out border-l-4 border-primary">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                    <CardTitle className="text-lg font-semibold text-gray-700">Enrolled Courses</CardTitle>
+                    <div className="rounded-full p-3 bg-gradient-to-br from-blue-400 to-teal-400">
+                      <BookOpen className="h-6 w-6 text-white" />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-4xl font-bold text-gray-900">{myCourses.length}</div>
+                    <p className="text-base text-gray-500">Active this semester</p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out border-l-4 border-accent">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                    <CardTitle className="text-lg font-semibold text-gray-700">Total Credits</CardTitle>
+                    <div className="rounded-full p-3 bg-gradient-to-br from-blue-400 to-teal-400">
+                      <GraduationCap className="h-6 w-6 text-white" />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-4xl font-bold text-gray-900">
+                      {myCourses.reduce((sum, course: any) => sum + (course.credits || 0), 0)}
+                    </div>
+                    <p className="text-base text-gray-500">Credit hours enrolled</p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out border-l-4 border-university-success">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                    <CardTitle className="text-lg font-semibold text-gray-700">Completed Courses</CardTitle>
+                    <div className="rounded-full p-3 bg-gradient-to-br from-blue-400 to-teal-400">
+                      <Trophy className="h-6 w-6 text-white" />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-4xl font-bold text-gray-900">{results.filter(r => r.studentNumber === selectedStudentNumber).length}</div>
+                    <p className="text-base text-gray-500">Courses successfully completed</p>
+                  </CardContent>
+                </Card>
+              </div>
+              <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-3xl font-bold text-gray-900">Available Courses</CardTitle>
+                  <CardDescription className="text-lg text-gray-600">Browse and register for available courses</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Table className="min-w-full divide-y divide-gray-200">
+                    <TableHeader className="bg-gray-50">
+                      <TableRow>
+                        <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Course Code</TableHead>
+                        <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Course Name</TableHead>
+                        <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Credits</TableHead>
+                        <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Instructor</TableHead>
+                        <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Action</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="my-courses">
-            <Card className="shadow-card">
-              <CardHeader>
-                <CardTitle>My Courses</CardTitle>
-                <CardDescription>Courses you are currently enrolled in</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Course Code</TableHead>
-                      <TableHead>Course Name</TableHead>
-                      <TableHead>Credits</TableHead>
-                      <TableHead>Instructor</TableHead>
-                      <TableHead>Registration Date</TableHead>
-                      <TableHead>Action</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {myCourses.map((course: any) => (
-                      <TableRow key={course.id}>
-                        <TableCell className="font-medium">{course.code}</TableCell>
-                        <TableCell>{course.title}</TableCell>
-                        <TableCell>{course.credits}</TableCell>
-                        <TableCell>{course.instructor}</TableCell>
-                        <TableCell>{course.registrationDate}</TableCell>
-                        <TableCell>
-                          <Button 
-                            size="sm" 
-                            variant="destructive"
-                            onClick={() => handleDrop(course.id)}
-                          >
-                            <Minus className="h-4 w-4 mr-1" />
-                            Drop
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="results">
-            <Card className="shadow-card">
-              <CardHeader>
-                <CardTitle>Academic Results</CardTitle>
-                <CardDescription>Your grades and academic performance</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Course Code</TableHead>
-                      <TableHead>Course Title</TableHead>
-                      <TableHead>Grade</TableHead>
-                      <TableHead>Credits</TableHead>
-                      <TableHead>Semester</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {results
-                      .filter((r) => r.studentNumber === selectedStudentNumber)
-                      .map((result) => (
-                        <TableRow key={result.id}>
-                          <TableCell className="font-medium">{result.courseCode}</TableCell>
-                          <TableCell>{result.courseName}</TableCell>
-                          <TableCell>
-                            <Badge className={getGradeColor(result.grade)}>
-                              {result.grade}
-                            </Badge>
+                    </TableHeader>
+                    <TableBody className="bg-white divide-y divide-gray-200">
+                      {availableCourses.map((course) => (
+                        <TableRow key={course.id}>
+                          <TableCell className="px-6 py-4 whitespace-nowrap font-medium text-base text-gray-900">{course.code}</TableCell>
+                          <TableCell className="px-6 py-4 whitespace-nowrap text-base text-gray-600">{course.title}</TableCell>
+                          <TableCell className="px-6 py-4 whitespace-nowrap text-base text-gray-600"><Badge variant="secondary">{course.credits}</Badge></TableCell>
+                          <TableCell className="px-6 py-4 whitespace-nowrap text-base text-gray-600">{course.instructor}</TableCell>
+                          <TableCell className="px-6 py-4 whitespace-nowrap text-right text-base font-medium">
+                            <Button 
+                              size="sm" 
+                              onClick={() => handleRegister(course.id)}
+                              className="bg-university-success hover:bg-university-success/90 text-white font-semibold"
+                            >
+                              <Plus className="h-5 w-5 mr-1" />
+                              Register
+                            </Button>
                           </TableCell>
-                          <TableCell>{courses.find(c => c.code === result.courseCode)?.credits ?? "-"}</TableCell>
-                          <TableCell>-</TableCell>
                         </TableRow>
                       ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+          
+          {activeTab === "my-courses" && (
+            <div className="space-y-8">
+              <div className="text-center">
+                <h1 className="text-5xl font-extrabold text-gray-900 mb-3">My Enrolled Courses</h1>
+                <p className="text-xl text-gray-600">Courses you are currently enrolled in.</p>
+              </div>
+              <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-3xl font-bold text-gray-900">My Enrolled Courses</CardTitle>
+                  <CardDescription className="text-lg text-gray-600">Courses you are currently enrolled in</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Table className="min-w-full divide-y divide-gray-200">
+                    <TableHeader className="bg-gray-50">
+                      <TableRow>
+                        <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Course Code</TableHead>
+                        <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Course Name</TableHead>
+                        <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Credits</TableHead>
+                        <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Instructor</TableHead>
+                        <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Registration Date</TableHead>
+                        <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Action</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody className="bg-white divide-y divide-gray-200">
+                      {myCourses.map((course: any) => (
+                        <TableRow key={course.id}>
+                          <TableCell className="px-6 py-4 whitespace-nowrap font-medium text-base text-gray-900">{course.code}</TableCell>
+                          <TableCell className="px-6 py-4 whitespace-nowrap text-base text-gray-600">{course.title}</TableCell>
+                          <TableCell className="px-6 py-4 whitespace-nowrap text-base text-gray-600"><Badge variant="secondary">{course.credits}</Badge></TableCell>
+                          <TableCell className="px-6 py-4 whitespace-nowrap text-base text-gray-600">{course.instructor}</TableCell>
+                          <TableCell className="px-6 py-4 whitespace-nowrap text-base text-gray-600">{course.registrationDate}</TableCell>
+                          <TableCell className="px-6 py-4 whitespace-nowrap text-right text-base font-medium">
+                            <Button 
+                              size="sm" 
+                              variant="destructive"
+                              onClick={() => handleDrop(course.id)}
+                              className="bg-red-600 hover:bg-red-700 text-white font-semibold"
+                            >
+                              <Minus className="h-5 w-5 mr-1" />
+                              Drop Course
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+          
+          {activeTab === "results" && (
+            <div className="space-y-8">
+              <div className="text-center">
+                <h1 className="text-5xl font-extrabold text-gray-900 mb-3">Academic Results</h1>
+                <p className="text-xl text-gray-600">Your grades and academic performance.</p>
+              </div>
+              <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-3xl font-bold text-gray-900">Academic Results</CardTitle>
+                  <CardDescription className="text-lg text-gray-600">Your grades and academic performance</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Table className="min-w-full divide-y divide-gray-200">
+                    <TableHeader className="bg-gray-50">
+                      <TableRow>
+                        <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Course Code</TableHead>
+                        <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Course Title</TableHead>
+                        <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Grade</TableHead>
+                        <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Credits</TableHead>
+                        <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Semester</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody className="bg-white divide-y divide-gray-200">
+                      {results
+                        .filter((r) => r.studentNumber === selectedStudentNumber)
+                        .map((result) => (
+                          <TableRow key={result.id}>
+                            <TableCell className="px-6 py-4 whitespace-nowrap font-medium text-base text-gray-900">{result.courseCode}</TableCell>
+                            <TableCell className="px-6 py-4 whitespace-nowrap text-base text-gray-600">{result.courseName}</TableCell>
+                            <TableCell className="px-6 py-4 whitespace-nowrap">
+                              <Badge className={`px-2 py-1 rounded-full text-sm font-semibold ${getGradeColor(result.grade)}`}>
+                                {result.grade}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="px-6 py-4 whitespace-nowrap text-base text-gray-600">{courses.find(c => c.code === result.courseCode)?.credits ?? "-"}</TableCell>
+                            <TableCell className="px-6 py-4 whitespace-nowrap text-base text-gray-600">-</TableCell>
+                          </TableRow>
+                        ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+          
+          {activeTab === "profile" && renderProfile()}
+        </div>
       </div>
     </div>
   );

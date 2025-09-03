@@ -11,6 +11,8 @@ import { useToast } from "@/hooks/use-toast";
 import { AdminNavigation } from "@/components/AdminNavigation";
 import { RegisterStudentDialog } from "@/components/RegisterStudentDialog";
 import api from "@/lib/axios";
+import { cn } from "@/lib/utils";
+import { TrendingUp } from "lucide-react";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -20,6 +22,7 @@ const AdminDashboard = () => {
   const [results, setResults] = useState([]);
   const [activeTab, setActiveTab] = useState("overview");
   const { toast } = useToast();
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
 
   // Course Management
   const [newCourse, setNewCourse] = useState({ code: "", title: "", credits: "", instructor: "" });
@@ -379,79 +382,98 @@ const AdminDashboard = () => {
   };
 
   const renderOverview = () => (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="shadow-card">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Courses</CardTitle>
-            <BookOpen className="h-4 w-4 text-muted-foreground" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out border-l-4 border-primary">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-lg font-semibold text-gray-700">Total Courses</CardTitle>
+            <div className="rounded-full p-3 bg-gradient-to-br from-blue-400 to-teal-400">
+              <BookOpen className="h-6 w-6 text-white" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-primary">{courses.length}</div>
-            <p className="text-xs text-muted-foreground">Active courses</p>
+            <div className="text-4xl font-bold text-gray-900">{courses.length}</div>
+            <p className="text-base text-gray-500">Active courses in the system</p>
           </CardContent>
         </Card>
         
-        <Card className="shadow-card">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Students</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out border-l-4 border-accent">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-lg font-semibold text-gray-700">Total Students</CardTitle>
+            <div className="rounded-full p-3 bg-gradient-to-br from-blue-400 to-teal-400">
+              <Users className="h-6 w-6 text-white" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-primary">{students.length}</div>
-            <p className="text-xs text-muted-foreground">Registered students</p>
+            <div className="text-4xl font-bold text-gray-900">{students.length}</div>
+            <p className="text-base text-gray-500">Registered students</p>
           </CardContent>
         </Card>
         
-        <Card className="shadow-card">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Results</CardTitle>
-            <Trophy className="h-4 w-4 text-muted-foreground" />
+        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out border-l-4 border-university-warning">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-lg font-semibold text-gray-700">Total Results</CardTitle>
+            <div className="rounded-full p-3 bg-gradient-to-br from-blue-400 to-teal-400">
+              <Trophy className="h-6 w-6 text-white" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-primary">{results.length}</div>
-            <p className="text-xs text-muted-foreground">Recorded grades</p>
+            <div className="text-4xl font-bold text-gray-900">{results.length}</div>
+            <p className="text-base text-gray-500">Academic results recorded</p>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out border-l-4 border-accent">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-lg font-semibold text-gray-700">System Status</CardTitle>
+            <div className="rounded-full p-3 bg-gradient-to-br from-blue-400 to-teal-400">
+              <TrendingUp className="h-6 w-6 text-white" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-4xl font-bold text-gray-900">100%</div>
+            <p className="text-base text-gray-500">Operational</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle>Recent Courses</CardTitle>
-            <CardDescription>Latest courses added to the system</CardDescription>
+        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-xl font-semibold text-gray-800">Recent Courses</CardTitle>
+            <CardDescription className="text-base text-gray-500">Latest courses added to the system</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {courses.slice(-3).map((course) => (
-                <div key={course.id} className="flex items-center justify-between">
+                <div key={course.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-md border border-gray-200">
                   <div>
-                    <p className="font-medium">{course.code}</p>
-                    <p className="text-sm text-muted-foreground">{course.title}</p>
+                    <p className="font-medium text-lg text-gray-800">{course.code} - {course.title}</p>
+                    <p className="text-base text-gray-600">Instructor: {course.instructor}</p>
                   </div>
-                  <Badge variant="secondary">{course.credits} credits</Badge>
+                  <Badge className="bg-primary/10 text-primary hover:bg-primary/20 transition-colors duration-200">{course.credits} Credits</Badge>
                 </div>
               ))}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle>Recent Students</CardTitle>
-            <CardDescription>Latest students registered in the system</CardDescription>
+        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-xl font-semibold text-gray-800">Recent Students</CardTitle>
+            <CardDescription className="text-base text-gray-500">Latest students registered in the system</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {students.slice(-3).map((student) => (
-                <div key={student.id} className="flex items-center justify-between">
+                <div key={student.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-md border border-gray-200">
                   <div>
-                    <p className="font-medium">{student.name}</p>
-                    <p className="text-sm text-muted-foreground">{student.email}</p>
+                    <p className="font-medium text-lg text-gray-800">{student.name}</p>
+                    <p className="text-base text-gray-600">{student.studentNumber} - {student.email}</p>
                   </div>
-                  <Badge variant="outline">{student.studentNumber}</Badge>
+                  <Badge variant="outline" className="text-gray-700">Student</Badge>
                 </div>
               ))}
             </div>
@@ -462,60 +484,64 @@ const AdminDashboard = () => {
   );
 
   const renderCourses = () => (
-    <Card className="shadow-card">
-      <CardHeader className="flex flex-row items-center justify-between">
+    <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <div>
-          <CardTitle>Course Management</CardTitle>
-          <CardDescription>Add, edit, and manage university courses</CardDescription>
+          <CardTitle className="text-3xl font-bold text-gray-900">Course Management</CardTitle>
+          <CardDescription className="text-lg text-gray-600">Add, edit, and manage university courses</CardDescription>
         </div>
         <Dialog open={isAddCourseOpen} onOpenChange={setIsAddCourseOpen}>
           <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Course
+            <Button className="bg-primary hover:bg-primary/90 text-white font-semibold py-2 px-4 rounded-md">
+              <Plus className="h-5 w-5 mr-2" />
+              Add New Course
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="sm:max-w-[480px]">
             <DialogHeader>
-              <DialogTitle>Add New Course</DialogTitle>
-              <DialogDescription>Fill in the course details below.</DialogDescription>
+              <DialogTitle className="text-2xl font-bold">Add New Course</DialogTitle>
+              <DialogDescription className="text-base">Fill in the course details below.</DialogDescription>
             </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="code">Course Code</Label>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="code" className="text-right text-base">Course Code</Label>
                 <Input
                   id="code"
                   value={newCourse.code}
                   onChange={(e) => setNewCourse({...newCourse, code: e.target.value})}
                   placeholder="e.g., CS101"
+                  className="col-span-3"
                 />
               </div>
-              <div>
-                <Label htmlFor="title">Course Title</Label>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="title" className="text-right text-base">Course Title</Label>
                 <Input
                   id="title"
                   value={newCourse.title}
                   onChange={(e) => setNewCourse({...newCourse, title: e.target.value})}
                   placeholder="e.g., Introduction to Computer Science"
+                  className="col-span-3"
                 />
               </div>
-              <div>
-                <Label htmlFor="credits">Credits</Label>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="credits" className="text-right text-base">Credits</Label>
                 <Input
                   id="credits"
                   type="number"
                   value={newCourse.credits}
                   onChange={(e) => setNewCourse({...newCourse, credits: e.target.value})}
                   placeholder="e.g., 3"
+                  className="col-span-3"
                 />
               </div>
-              <div>
-                <Label htmlFor="instructor">Instructor</Label>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="instructor" className="text-right text-base">Instructor</Label>
                 <Input
                   id="instructor"
                   value={newCourse.instructor}
                   onChange={(e) => setNewCourse({...newCourse, instructor: e.target.value})}
                   placeholder="e.g., Dr. Smith"
+                  className="col-span-3"
                 />
               </div>
             </div>
@@ -527,34 +553,35 @@ const AdminDashboard = () => {
         </Dialog>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
+        <Table className="min-w-full divide-y divide-gray-200">
+          <TableHeader className="bg-gray-50">
             <TableRow>
-              <TableHead>Course Code</TableHead>
-              <TableHead>Course Title</TableHead>
-              <TableHead>Credits</TableHead>
-              <TableHead>Instructor</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Course Code</TableHead>
+              <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Course Title</TableHead>
+              <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Credits</TableHead>
+              <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Instructor</TableHead>
+              <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Actions</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
+          <TableBody className="bg-white divide-y divide-gray-200">
             {courses.map((course) => (
               <TableRow key={course.id}>
-                <TableCell className="font-medium">{course.code}</TableCell>
-                <TableCell>{course.title}</TableCell>
-                <TableCell>{course.credits}</TableCell>
-                <TableCell>{course.instructor}</TableCell>
-                <TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap font-medium text-base text-gray-900">{course.code}</TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap text-base text-gray-600">{course.title}</TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap text-base text-gray-600"><Badge variant="secondary">{course.credits}</Badge></TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap text-base text-gray-600">{course.instructor}</TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap text-right text-base font-medium">
                   <div className="flex space-x-2">
-                    <Button size="sm" variant="outline" onClick={() => openEditCourse(course)}>
-                      <Edit className="h-4 w-4" />
+                    <Button size="icon" variant="outline" className="h-9 w-9 text-blue-600 hover:text-blue-900 hover:bg-blue-50" onClick={() => openEditCourse(course)}>
+                      <Edit className="h-5 w-5" />
                     </Button>
                     <Button 
-                      size="sm" 
+                      size="icon" 
                       variant="destructive"
+                      className="h-9 w-9 bg-red-600 hover:bg-red-700"
                       onClick={() => handleDeleteCourse(course.id)}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-5 w-5" />
                     </Button>
                   </div>
                 </TableCell>
@@ -569,47 +596,51 @@ const AdminDashboard = () => {
   // Edit Course Dialog
   const renderEditCourseDialog = () => (
     <Dialog open={isEditCourseOpen} onOpenChange={setIsEditCourseOpen}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[480px]">
         <DialogHeader>
-          <DialogTitle>Edit Course</DialogTitle>
-          <DialogDescription>Update the course details below.</DialogDescription>
+          <DialogTitle className="text-2xl font-bold">Edit Course</DialogTitle>
+          <DialogDescription className="text-base">Update the course details below.</DialogDescription>
         </DialogHeader>
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="edit-code">Course Code</Label>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="edit-code" className="text-right text-base">Course Code</Label>
             <Input
               id="edit-code"
               value={editCourse.code}
               onChange={(e) => setEditCourse({ ...editCourse, code: e.target.value })}
               placeholder="e.g., CS101"
+              className="col-span-3"
             />
           </div>
-          <div>
-            <Label htmlFor="edit-title">Course Title</Label>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="edit-title" className="text-right text-base">Course Title</Label>
             <Input
               id="edit-title"
               value={editCourse.title}
               onChange={(e) => setEditCourse({ ...editCourse, title: e.target.value })}
               placeholder="e.g., Introduction to Computer Science"
+              className="col-span-3"
             />
           </div>
-          <div>
-            <Label htmlFor="edit-credits">Credits</Label>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="edit-credits" className="text-right text-base">Credits</Label>
             <Input
               id="edit-credits"
               type="number"
               value={editCourse.credits}
               onChange={(e) => setEditCourse({ ...editCourse, credits: e.target.value })}
               placeholder="e.g., 3"
+              className="col-span-3"
             />
           </div>
-          <div>
-            <Label htmlFor="edit-instructor">Instructor</Label>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="edit-instructor" className="text-right text-base">Instructor</Label>
             <Input
               id="edit-instructor"
               value={editCourse.instructor}
               onChange={(e) => setEditCourse({ ...editCourse, instructor: e.target.value })}
               placeholder="e.g., Dr. Smith"
+              className="col-span-3"
             />
           </div>
         </div>
@@ -624,38 +655,41 @@ const AdminDashboard = () => {
   // Edit Student Dialog
   const renderEditStudentDialog = () => (
     <Dialog open={isEditStudentOpen} onOpenChange={setIsEditStudentOpen}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[480px]">
         <DialogHeader>
-          <DialogTitle>Edit Student</DialogTitle>
-          <DialogDescription>Update the student details below.</DialogDescription>
+          <DialogTitle className="text-2xl font-bold">Edit Student</DialogTitle>
+          <DialogDescription className="text-base">Update the student details below.</DialogDescription>
         </DialogHeader>
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="edit-student-name">Full Name</Label>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="edit-student-name" className="text-right text-base">Full Name</Label>
             <Input
               id="edit-student-name"
               value={editStudent.name}
               onChange={(e) => setEditStudent({ ...editStudent, name: e.target.value })}
               placeholder="e.g., John Doe"
+              className="col-span-3"
             />
           </div>
-          <div>
-            <Label htmlFor="edit-student-email">Email</Label>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="edit-student-email" className="text-right text-base">Email</Label>
             <Input
               id="edit-student-email"
               type="email"
               value={editStudent.email}
               onChange={(e) => setEditStudent({ ...editStudent, email: e.target.value })}
               placeholder="e.g., john.doe@university.edu"
+              className="col-span-3"
             />
           </div>
-          <div>
-            <Label htmlFor="edit-student-number">Student Number</Label>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="edit-student-number" className="text-right text-base">Student Number</Label>
             <Input
               id="edit-student-number"
               value={editStudent.studentNumber}
               onChange={(e) => setEditStudent({ ...editStudent, studentNumber: e.target.value })}
               placeholder="e.g., STU001"
+              className="col-span-3"
             />
           </div>
         </div>
@@ -668,34 +702,34 @@ const AdminDashboard = () => {
   );
 
   const renderStudents = () => (
-    <Card className="shadow-card">
-      <CardHeader className="flex flex-row items-center justify-between">
+    <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <div>
-          <CardTitle>Student Management</CardTitle>
-          <CardDescription>Add, edit, and manage student accounts</CardDescription>
+          <CardTitle className="text-3xl font-bold text-gray-900">Student Management</CardTitle>
+          <CardDescription className="text-lg text-gray-600">Add, edit, and manage student accounts</CardDescription>
         </div>
         <RegisterStudentDialog onStudentRegistered={fetchStudents} />
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
+        <Table className="min-w-full divide-y divide-gray-200">
+          <TableHeader className="bg-gray-50">
             <TableRow>
-              <TableHead>Student Number</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Password</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Student Number</TableHead>
+              <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Name</TableHead>
+              <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Email</TableHead>
+              <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Password</TableHead>
+              <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Actions</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
+          <TableBody className="bg-white divide-y divide-gray-200">
             {students.map((student) => (
               <TableRow key={student.id}>
-                <TableCell className="font-medium">{student.studentNumber}</TableCell>
-                <TableCell>{student.name}</TableCell>
-                <TableCell>{student.email}</TableCell>
-                <TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap font-medium text-base text-gray-900">{student.studentNumber}</TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap text-base text-gray-600">{student.name}</TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap text-base text-gray-600">{student.email}</TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center space-x-2">
-                    <span>
+                    <span className="text-base text-gray-600">
                       {student.user?.password
                         ? (showPasswords[student.id] ? student.user.password : "••••••••")
                         : "-"
@@ -703,31 +737,32 @@ const AdminDashboard = () => {
                     </span>
                     {student.user?.password && (
                       <Button
-                        size="sm"
+                        size="icon"
                         variant="ghost"
                         onClick={() => togglePasswordVisibility(student.id)}
-                        className="h-6 w-6 p-0"
+                        className="h-8 w-8 p-0 text-gray-500 hover:bg-gray-100"
                       >
                         {showPasswords[student.id] ? (
-                          <EyeOff className="h-3 w-3" />
+                          <EyeOff className="h-5 w-5" />
                         ) : (
-                          <Eye className="h-3 w-3" />
+                          <Eye className="h-5 w-5" />
                         )}
                       </Button>
                     )}
                   </div>
                 </TableCell>
-                <TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap text-right text-base font-medium">
                   <div className="flex space-x-2">
-                    <Button size="sm" variant="outline" onClick={() => openEditStudent(student)}>
-                      <Edit className="h-4 w-4" />
+                    <Button size="icon" variant="outline" className="h-9 w-9 text-blue-600 hover:text-blue-900 hover:bg-blue-50" onClick={() => openEditStudent(student)}>
+                      <Edit className="h-5 w-5" />
                     </Button>
                     <Button 
-                      size="sm" 
+                      size="icon" 
                       variant="destructive"
+                      className="h-9 w-9 bg-red-600 hover:bg-red-700"
                       onClick={() => handleDeleteStudent(student.id)}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-5 w-5" />
                     </Button>
                   </div>
                 </TableCell>
@@ -740,50 +775,53 @@ const AdminDashboard = () => {
   );
 
   const renderResults = () => (
-    <Card className="shadow-card">
-      <CardHeader className="flex flex-row items-center justify-between">
+    <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <div>
-          <CardTitle>Results Management</CardTitle>
-          <CardDescription>View and manage student grades and results</CardDescription>
+          <CardTitle className="text-3xl font-bold text-gray-900">Results Management</CardTitle>
+          <CardDescription className="text-lg text-gray-600">View and manage student grades and results</CardDescription>
         </div>
         <Dialog open={isAddResultOpen} onOpenChange={setIsAddResultOpen}>
           <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Result
+            <Button className="bg-primary hover:bg-primary/90 text-white font-semibold py-2 px-4 rounded-md">
+              <Plus className="h-5 w-5 mr-2" />
+              Add New Result
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="sm:max-w-[480px]">
             <DialogHeader>
-              <DialogTitle>Add New Result</DialogTitle>
-              <DialogDescription>Record a grade for a student and course.</DialogDescription>
+              <DialogTitle className="text-2xl font-bold">Add New Result</DialogTitle>
+              <DialogDescription className="text-base">Record a grade for a student and course.</DialogDescription>
             </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="studentNumber">Student Number</Label>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="studentNumber" className="text-right text-base">Student Number</Label>
                 <Input
                   id="studentNumber"
                   value={newResult.studentNumber}
                   onChange={(e) => setNewResult({ ...newResult, studentNumber: e.target.value })}
                   placeholder="e.g., STU001"
+                  className="col-span-3"
                 />
               </div>
-              <div>
-                <Label htmlFor="courseCode">Course Code</Label>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="courseCode" className="text-right text-base">Course Code</Label>
                 <Input
                   id="courseCode"
                   value={newResult.courseCode}
                   onChange={(e) => setNewResult({ ...newResult, courseCode: e.target.value })}
                   placeholder="e.g., CS101"
+                  className="col-span-3"
                 />
               </div>
-              <div>
-                <Label htmlFor="grade">Grade</Label>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="grade" className="text-right text-base">Grade</Label>
                 <Input
                   id="grade"
                   value={newResult.grade}
                   onChange={(e) => setNewResult({ ...newResult, grade: e.target.value })}
                   placeholder="e.g., A, B+, C"
+                  className="col-span-3"
                 />
               </div>
             </div>
@@ -795,34 +833,34 @@ const AdminDashboard = () => {
         </Dialog>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
+        <Table className="min-w-full divide-y divide-gray-200">
+          <TableHeader className="bg-gray-50">
             <TableRow>
-              <TableHead>Student Number</TableHead>
-              <TableHead>Course Code</TableHead>
-              <TableHead>Course Name</TableHead>
-              <TableHead>Grade</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Student Number</TableHead>
+              <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Course Code</TableHead>
+              <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Course Name</TableHead>
+              <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Grade</TableHead>
+              <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Actions</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
+          <TableBody className="bg-white divide-y divide-gray-200">
             {results.map((result) => (
               <TableRow key={result.id}>
-                <TableCell className="font-medium">{result.studentNumber}</TableCell>
-                <TableCell>{result.courseCode}</TableCell>
-                <TableCell>{result.courseName}</TableCell>
-                <TableCell>
-                  <Badge className={getGradeColor(result.grade)}>
+                <TableCell className="px-6 py-4 whitespace-nowrap font-medium text-base text-gray-900">{result.studentNumber}</TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap text-base text-gray-600">{result.courseCode}</TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap text-base text-gray-600">{result.courseName}</TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap">
+                  <Badge className={`px-2 py-1 rounded-full text-sm font-semibold ${getGradeColor(result.grade)}`}>
                     {result.grade}
                   </Badge>
                 </TableCell>
-                <TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap text-right text-base font-medium">
                   <div className="flex space-x-2">
-                    <Button size="sm" variant="outline" onClick={() => openEditResult(result)}>
-                      <Edit className="h-4 w-4" />
+                    <Button size="icon" variant="outline" className="h-9 w-9 text-blue-600 hover:text-blue-900 hover:bg-blue-50" onClick={() => openEditResult(result)}>
+                      <Edit className="h-5 w-5" />
                     </Button>
-                    <Button size="sm" variant="destructive" onClick={() => handleDeleteResult(result.id)}>
-                      <Trash2 className="h-4 w-4" />
+                    <Button size="icon" variant="destructive" className="h-9 w-9 bg-red-600 hover:bg-red-700" onClick={() => handleDeleteResult(result.id)}>
+                      <Trash2 className="h-5 w-5" />
                     </Button>
                   </div>
                 </TableCell>
@@ -833,37 +871,40 @@ const AdminDashboard = () => {
       </CardContent>
       {/* Edit Result Dialog */}
       <Dialog open={isEditResultOpen} onOpenChange={setIsEditResultOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[480px]">
           <DialogHeader>
-            <DialogTitle>Edit Result</DialogTitle>
-            <DialogDescription>Update the grade or identifiers for this result.</DialogDescription>
+            <DialogTitle className="text-2xl font-bold">Edit Result</DialogTitle>
+            <DialogDescription className="text-base">Update the grade or identifiers for this result.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="edit-studentNumber">Student Number</Label>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="edit-studentNumber" className="text-right text-base">Student Number</Label>
               <Input
                 id="edit-studentNumber"
                 value={editResult.studentNumber}
                 onChange={(e) => setEditResult({ ...editResult, studentNumber: e.target.value })}
                 placeholder="e.g., STU001"
+                className="col-span-3"
               />
             </div>
             <div>
-              <Label htmlFor="edit-courseCode">Course Code</Label>
+              <Label htmlFor="edit-courseCode" className="text-right text-base">Course Code</Label>
               <Input
                 id="edit-courseCode"
                 value={editResult.courseCode}
                 onChange={(e) => setEditResult({ ...editResult, courseCode: e.target.value })}
                 placeholder="e.g., CS101"
+                className="col-span-3"
               />
             </div>
             <div>
-              <Label htmlFor="edit-grade">Grade</Label>
+              <Label htmlFor="edit-grade" className="text-right text-base">Grade</Label>
               <Input
                 id="edit-grade"
                 value={editResult.grade}
                 onChange={(e) => setEditResult({ ...editResult, grade: e.target.value })}
                 placeholder="e.g., A, B+, C"
+                className="col-span-3"
               />
             </div>
           </div>
@@ -877,23 +918,27 @@ const AdminDashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background">
-      <AdminNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
+    <div className={cn("min-h-screen bg-gray-50", isSidebarExpanded ? "admin-dashboard-container expanded" : "admin-dashboard-container")}>
+      <AdminNavigation activeTab={activeTab} setActiveTab={setActiveTab} setIsExpanded={setIsSidebarExpanded} />
       
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Admin Dashboard</h1>
-          <p className="text-muted-foreground">Manage courses, students, and academic records.</p>
-        </div>
-
+      <div className="flex-1 transition-all duration-300" style={{ marginLeft: isSidebarExpanded ? "var(--sidebar-width-expanded)" : "var(--sidebar-width-collapsed)" }}>
         {/* Content based on active tab */}
-        {activeTab === "overview" && renderOverview()}
-        {activeTab === "courses" && renderCourses()}
-        {activeTab === "students" && renderStudents()}
-        {activeTab === "results" && renderResults()}
-        {renderEditCourseDialog()}
-        {renderEditStudentDialog()}
+        <div className="container mx-auto px-6 py-10">
+          {activeTab === "overview" && (
+            <div className="space-y-8">
+              <div className="text-center">
+                <h1 className="text-5xl font-extrabold text-gray-900 mb-3">Admin Dashboard</h1>
+                <p className="text-xl text-gray-600">Manage university courses, student registrations, and academic records with ease.</p>
+              </div>
+              {renderOverview()}
+            </div>
+          )}
+          {activeTab === "courses" && renderCourses()}
+          {activeTab === "students" && renderStudents()}
+          {activeTab === "results" && renderResults()}
+          {renderEditCourseDialog()}
+          {renderEditStudentDialog()}
+        </div>
       </div>
     </div>
   );
