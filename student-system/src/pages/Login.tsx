@@ -128,11 +128,6 @@ const Login = () => {
               </Button>
             </form>
 
-            <div className="mt-8 text-center text-base text-gray-500">
-              <p className="mb-1">Demo Credentials:</p>
-              <p className="font-mono text-sm">Admin: admin@university.edu / admin123</p>
-              <p className="font-mono text-sm">Student: potter@stu.university.edu / potter123</p>
-            </div>
           </CardContent>
         </Card>
       </div>
